@@ -36,7 +36,7 @@ def parse(text: str) -> (str, str):
         logging.debug('Roll descriptor: \'' + text[len(value):len(text)].strip() + '\'')
         return value, text[len(value):len(text)].strip()
 
-    return '', False
+    return False, ''
 
 def tokenize(text: str, prefix=True) -> list:
     # Only if prefix is True, discard the first element (i.e. /roll)
@@ -93,7 +93,7 @@ def get(value) -> (int, list, TokenKind):
     kind = get_kind(value)
 
     # Dice roll, format r'\d*d\d+'
-    if get_kind(value) == TokenKind.ROLL:
+    if kind == TokenKind.ROLL:
         split = value.split('d')
         # Normal split, result of dice format r'\d+d\d+' (e.g. '6d6')
         if len(split[0]) > 0:
@@ -105,7 +105,7 @@ def get(value) -> (int, list, TokenKind):
             return result, steps, TokenKind.ROLL
 
     # Constant
-    if get_kind(value) == TokenKind.NUMBER:
+    if kind == TokenKind.NUMBER:
         return int(value), [value], TokenKind.NUMBER
 
     # + or -
@@ -136,7 +136,7 @@ def roll(roll_expr: str) -> (int, list):
 def process_roll(iterations, value) -> (int, list):
     result = 0
     steps = []
-    for i in range(iterations):
+    for _ in range(iterations):
         random_roll = random.randint(1, int(value))
         result += random_roll
         steps.append(random_roll)
@@ -160,4 +160,4 @@ def process_roll(iterations, value) -> (int, list):
 
 # logging.debug(roll('/r 1d20+14'))
 
-logging.debug(get_step([1, 4, 5], token_kind=TokenKind.ROLL))
+# logging.debug(get_step([1, 4, 5], token_kind=TokenKind.ROLL))
