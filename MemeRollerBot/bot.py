@@ -9,7 +9,7 @@ bot = telepot.Bot('TOKEN')
 
 
 def handle(msg):
-    content_type, chat_type, chat_id, _, msg_id = telepot.glance(msg, long=True)
+    content_type, _, chat_id, _, msg_id = telepot.glance(msg, long=True)
     dice.logging.debug(f'Received message from {msg["from"]["username"]} ({chat_id})')
 
     if content_type == 'text':

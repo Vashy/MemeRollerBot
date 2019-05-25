@@ -15,7 +15,7 @@ multi_roll = r'(?:/r|/roll)\s+\d*d\d+[+-]\d+(?:/[+-]\d+)+'
 class TokenKind(Enum):
     ROLL=r'\d*d\d'
     NUMBER=r'\d+'
-    OPERATOR=r'[+-]'
+    OPERATOR=r'[+-/]'
 
 
 def parse(text: str) -> (str, str):
@@ -123,10 +123,11 @@ def get_step(steps: list, token_kind: TokenKind) -> str:
             result = ''.join([
                 result,
                 str(step),
-                '+'
+                '+',
             ])
         result = result[:-1] # Removes the last '+'
         return ''.join([result, ')'])
+    # Single element list
     return steps[0]
 
 def roll(roll_expr: str) -> (int, list):
