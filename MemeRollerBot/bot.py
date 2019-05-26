@@ -39,5 +39,13 @@ def build_msg(username, result, steps, roll_desc):
 
 MessageLoop(bot, handle).run_as_thread()
 
-while True:
-    time.sleep(1)
+dice.logging.info('-----------------------')
+dice.logging.info('Launching MemeRollerBot')
+dice.logging.info('-----------------------')
+
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    print('\nbye')
+
