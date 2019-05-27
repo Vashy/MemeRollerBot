@@ -1,29 +1,48 @@
 import time
+import os
+
+import logging
 
 import telepot
 from telepot.loop import MessageLoop
 
-import dice
+import dice as dice
 
-bot = telepot.Bot('TOKEN')
+
+logging.basicConfig(level='DEBUG', format='%(asctime)s [%(levelname)s] : %(message)s')
+
+
+if not os.environ['BOT_TOKEN']:
+    raise EnvironmentError("BOT_TOKEN variable not set")
+
+BOT = telepot.Bot(os.environ['BOT_TOKEN'])
 
 
 def handle(msg):
     content_type, _, chat_id, _, msg_id = telepot.glance(msg, long=True)
-    dice.logging.debug(f'Received message from {msg["from"]["username"]} ({chat_id})')
+    logging.debug(f'Received message from {msg["from"]["username"]} ({chat_id})')
 
     if content_type == 'text':
         roll_expression, roll_desc = dice.parse(msg['text'])
         if roll_expression:
             result, steps = dice.roll(roll_expression)
             response = build_msg(msg['from']['username'], result, steps, roll_desc)
-            bot.sendMessage(chat_id, response, reply_to_message_id=msg_id, parse_mode='markdown')
+            BOT.sendMessage(chat_id, response, reply_to_message_id=msg_id, parse_mode='markdown')
 
-def build_msg(username, result, steps, roll_desc):
-    final_msg = ''.join([
-        username,
-        f' rolled *{roll_desc}*:\n`',
-    ])
+def build_msg(username: str, result, steps, roll_desc):
+
+    final_msg = f'*{username}*'
+    if roll_desc:
+        final_msg = ''.join([
+            final_msg,
+            f' rolled *{roll_desc}*:\n`',
+        ])
+    else:
+        final_msg = ''.join([
+            final_msg,
+            f' rolled:\n`',
+        ])
+
     for step in steps:
         final_msg = ''.join([
             final_msg,
@@ -37,15 +56,14 @@ def build_msg(username, result, steps, roll_desc):
     ])
     return final_msg
 
-MessageLoop(bot, handle).run_as_thread()
+MessageLoop(BOT, handle).run_as_thread()
 
-dice.logging.info('-----------------------')
-dice.logging.info('Launching MemeRollerBot')
-dice.logging.info('-----------------------')
+logging.info('-----------------------')
+logging.info('Launching MemeRollerBot')
+logging.info('-----------------------')
 
 try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
     print('\nbye')
-

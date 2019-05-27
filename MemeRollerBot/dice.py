@@ -4,24 +4,23 @@ import logging
 import random
 from enum import Enum
 
+from roller import Roller
 
-logging.basicConfig(level='DEBUG', format='%(asctime)s [%(levelname)s] : %(message)s')
 
-# bot_token = ''
-normal_roll = r'(?:/r|/roll)\s+(?:(\d*d\d+)|(\d+))(?:([+-])((\d*d\d+)|(\d+)))*'
-multi_roll = r'(?:/r|/roll)\s+\d*d\d+[+-]\d+(?:/[+-]\d+)+'
+NORMAL_ROLL = r'(?:/r|/roll)\s+(?:(\d*d\d+)|(\d+))(?:([+-])((\d*d\d+)|(\d+)))*'
+MULTI_ROLL = r'(?:/r|/roll)\s+\d*d\d+[+-]\d+(?:/[+-]\d+)+'
 
 
 class TokenKind(Enum):
-    ROLL=r'\d*d\d'
-    NUMBER=r'\d+'
-    OPERATOR=r'[+-/]'
+    ROLL = r'\d*d\d'
+    NUMBER = r'\d+'
+    OPERATOR = r'[+-/]'
 
 
 def parse(text: str) -> (str, str):
 
     # Multiattack roll match
-    match_multi_roll = re.search(multi_roll, text)
+    match_multi_roll = re.search(MULTI_ROLL, text)
     if match_multi_roll:
         value = match_multi_roll.group(0)
         logging.debug('Matched multi roll: \'' + value + '\', match length: ' + str(len(value)))
@@ -29,7 +28,7 @@ def parse(text: str) -> (str, str):
         return value, text[len(value):len(text)].strip()
 
     # Normal match
-    match = re.search(normal_roll, text)
+    match = re.search(NORMAL_ROLL, text)
     if not match_multi_roll and match:
         value = match.group(0)
         logging.debug('Matched normal roll: \'' + value + '\', match length: ' + str(len(value)))
@@ -37,6 +36,10 @@ def parse(text: str) -> (str, str):
         return value, text[len(value):len(text)].strip()
 
     return False, ''
+
+
+class DiceRoller(Roller):
+    pass
 
 def tokenize(text: str, prefix=True) -> list:
     # Only if prefix is True, discard the first element (i.e. /roll)
@@ -143,22 +146,24 @@ def process_roll(iterations, value) -> (int, list):
         steps.append(random_roll)
     return result, steps
 
-# logging.debug(tokenize("/r 1d20+23+17"))
-# logging.debug(tokenize("/roll 1d20+12"))
-# logging.debug(tokenize("/roll 1d20+12"))
-# logging.debug(tokenize("/roll d20"))
-# logging.debug(tokenize("/roll 1d20-12+1d4-4"))
-# logging.debug(get('1d20'))
-# logging.debug(get('4d20'))
+if __name__ == "__main__":
 
-# dice_roll = tokenize('/roll 1d20+13')
-# logging.debug(compute(dice_roll))
+    # logging.debug(tokenize("/r 1d20+23+17"))
+    # logging.debug(tokenize("/roll 1d20+12"))
+    # logging.debug(tokenize("/roll 1d20+12"))
+    # logging.debug(tokenize("/roll d20"))
+    print(tokenize("/roll 1d20-12+1d4-4"))
+    # logging.debug(get('1d20'))
+    # logging.debug(get('4d20'))
 
-# dice_roll = tokenize('/roll 1d20-4d4+12')
-# logging.debug('roll: ' + str(compute(dice_roll)))
-# parse('/r 1d20+12-2+4 ancd asdoasid oiasd ')
-# parse('/r 1d20+12/+7/+2 ancd asdoasid oiasd    ')
+    # dice_roll = tokenize('/roll 1d20+13')
+    # logging.debug(compute(dice_roll))
 
-# logging.debug(roll('/r 1d20+14'))
+    # dice_roll = tokenize('/roll 1d20-4d4+12')
+    # logging.debug('roll: ' + str(compute(dice_roll)))
+    # parse('/r 1d20+12-2+4 ancd asdoasid oiasd ')
+    # parse('/r 1d20+12/+7/+2 ancd asdoasid oiasd    ')
 
-# logging.debug(get_step([1, 4, 5], token_kind=TokenKind.ROLL))
+    # logging.debug(roll('/r 1d20+14'))
+
+    # logging.debug(get_step([1, 4, 5], token_kind=TokenKind.ROLL))
