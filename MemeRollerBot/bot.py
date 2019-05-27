@@ -11,8 +11,7 @@ import dice as dice
 
 logging.basicConfig(level='DEBUG', format='%(asctime)s [%(levelname)s] : %(message)s')
 
-
-if not os.environ['BOT_TOKEN']:
+if 'BOT_TOKEN' not in os.environ:
     raise EnvironmentError("BOT_TOKEN variable not set")
 
 BOT = telepot.Bot(os.environ['BOT_TOKEN'])
